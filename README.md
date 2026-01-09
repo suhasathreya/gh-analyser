@@ -20,9 +20,30 @@ An autonomous AI-powered tool for analyzing GitHub profiles of technical candida
 
 ## Quick Start
 
-### 1. Set Up API Keys
+### 1. Clone the Repository
 
-Edit the `.env` file and add your API keys:
+```bash
+git clone https://github.com/suhasathreya/gh-analyser.git
+cd gh-analyser
+```
+
+### 2. Install Dependencies
+
+```bash
+python -m venv .venv
+
+# On Windows
+.venv\Scripts\activate
+
+# On macOS/Linux
+source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Set Up API Keys
+
+Create a `.env` file (copy from `.env.example`) and add your API keys:
 
 ```env
 # Required - Get from https://console.anthropic.com/
@@ -47,17 +68,7 @@ GITHUB_TOKEN=ghp_your-token-here
 4. Generate and copy the token
 5. Paste into `.env`
 
-### 2. Activate Virtual Environment
-
-```bash
-# On Windows
-.venv\Scripts\activate
-
-# On macOS/Linux
-source .venv/bin/activate
-```
-
-### 3. Run the Application
+### 4. Run the Application
 
 ```bash
 # Start the server
