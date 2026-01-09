@@ -5,13 +5,11 @@ Export utilities for generating PDF and Word documents from markdown reports.
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-
-try:
-    from weasyprint import HTML, CSS
-    WEASYPRINT_AVAILABLE = True
-except (ImportError, OSError):
-    WEASYPRINT_AVAILABLE = False
-    print("Warning: WeasyPrint not available. PDF export will use alternative method.")
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.enums import TA_LEFT, TA_CENTER
 
 import markdown
 import os
@@ -20,7 +18,7 @@ import re
 
 def generate_pdf(analysis_id: str) -> str:
     """
-    Generate a styled PDF from the markdown report.
+    Generate a styled PDF from the markdown report using ReportLab.
 
     Args:
         analysis_id: Analysis ID
@@ -30,15 +28,7 @@ def generate_pdf(analysis_id: str) -> str:
 
     Raises:
         FileNotFoundError: If report markdown doesn't exist
-        RuntimeError: If WeasyPrint is not available
     """
-    if not WEASYPRINT_AVAILABLE:
-        raise RuntimeError(
-            "PDF generation not available. WeasyPrint requires additional system libraries. "
-            "Please use Word export or Markdown copy instead. "
-            "See: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation"
-        )
-
     report_path = f"analyses/{analysis_id}/report.md"
     pdf_path = f"analyses/{analysis_id}/report.pdf"
 
@@ -46,137 +36,83 @@ def generate_pdf(analysis_id: str) -> str:
     with open(report_path, "r", encoding="utf-8") as f:
         md_content = f.read()
 
-    # Convert markdown to HTML with extensions
-    html_content = markdown.markdown(
-        md_content,
-        extensions=['tables', 'fenced_code', 'nl2br']
+    # Create PDF document
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4, topMargin=0.75*inch, bottomMargin=0.75*inch)
+    story = []
+
+    # Define styles
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        textColor='#1a1a1a',
+        spaceAfter=12
     )
 
-    # Create styled HTML
-    styled_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @page {{
-                margin: 2cm;
-                size: A4;
-            }}
+    heading2_style = ParagraphStyle(
+        'CustomHeading2',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor='#2c3e50',
+        spaceAfter=10,
+        spaceBefore=10
+    )
 
-            body {{
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 11pt;
-                line-height: 1.6;
-                color: #333;
-            }}
+    heading3_style = ParagraphStyle(
+        'CustomHeading3',
+        parent=styles['Heading3'],
+        fontSize=12,
+        textColor='#34495e',
+        spaceAfter=8,
+        spaceBefore=8
+    )
 
-            h1 {{
-                color: #1a1a1a;
-                border-bottom: 3px solid #4A90E2;
-                padding-bottom: 10px;
-                margin-top: 20px;
-                font-size: 24pt;
-            }}
+    body_style = styles['BodyText']
+    body_style.fontSize = 10
+    body_style.leading = 14
 
-            h2 {{
-                color: #2c3e50;
-                border-bottom: 2px solid #ddd;
-                padding-bottom: 5px;
-                margin-top: 20px;
-                font-size: 18pt;
-            }}
+    # Parse markdown line by line
+    lines = md_content.split('\n')
 
-            h3 {{
-                color: #34495e;
-                margin-top: 15px;
-                font-size: 14pt;
-            }}
+    for line in lines:
+        line = line.strip()
 
-            code {{
-                background-color: #f4f4f4;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-family: 'Courier New', monospace;
-                font-size: 10pt;
-            }}
+        if not line:
+            story.append(Spacer(1, 0.1*inch))
+            continue
 
-            pre {{
-                background-color: #f8f8f8;
-                border: 1px solid #ddd;
-                border-left: 4px solid #4A90E2;
-                padding: 15px;
-                overflow-x: auto;
-                border-radius: 4px;
-            }}
+        # Headers
+        if line.startswith('# '):
+            text = line[2:].strip()
+            story.append(Paragraph(text, title_style))
+        elif line.startswith('## '):
+            text = line[3:].strip()
+            story.append(Paragraph(text, heading2_style))
+        elif line.startswith('### '):
+            text = line[4:].strip()
+            story.append(Paragraph(text, heading3_style))
+        # Horizontal rules
+        elif line.startswith('---') or line.startswith('***'):
+            story.append(Spacer(1, 0.2*inch))
+        # Lists
+        elif line.startswith('- ') or line.startswith('* '):
+            text = line[2:].strip()
+            # Remove markdown formatting
+            text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+            text = re.sub(r'`(.*?)`', r'<font name="Courier">\1</font>', text)
+            story.append(Paragraph(f"• {text}", body_style))
+        # Regular text
+        else:
+            # Remove/convert markdown formatting
+            text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', line)
+            text = re.sub(r'`(.*?)`', r'<font name="Courier">\1</font>', text)
+            story.append(Paragraph(text, body_style))
 
-            pre code {{
-                background: none;
-                padding: 0;
-            }}
-
-            table {{
-                border-collapse: collapse;
-                width: 100%;
-                margin: 20px 0;
-            }}
-
-            th, td {{
-                border: 1px solid #ddd;
-                padding: 10px;
-                text-align: left;
-            }}
-
-            th {{
-                background-color: #4A90E2;
-                color: white;
-                font-weight: bold;
-            }}
-
-            tr:nth-child(even) {{
-                background-color: #f9f9f9;
-            }}
-
-            strong {{
-                color: #2c3e50;
-            }}
-
-            em {{
-                color: #555;
-            }}
-
-            ul, ol {{
-                margin: 10px 0;
-                padding-left: 30px;
-            }}
-
-            li {{
-                margin: 5px 0;
-            }}
-
-            hr {{
-                border: none;
-                border-top: 1px solid #ddd;
-                margin: 20px 0;
-            }}
-
-            blockquote {{
-                border-left: 4px solid #4A90E2;
-                margin: 15px 0;
-                padding-left: 15px;
-                color: #666;
-                font-style: italic;
-            }}
-        </style>
-    </head>
-    <body>
-        {html_content}
-    </body>
-    </html>
-    """
-
-    # Generate PDF using weasyprint
-    HTML(string=styled_html).write_pdf(pdf_path)
+    # Build PDF
+    doc.build(story)
 
     return pdf_path
 
