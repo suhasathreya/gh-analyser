@@ -57,10 +57,10 @@ TASK - Complete this analysis autonomously:
    - Activity level: 10% weight
      (number of commits, stars, watchers)
 
-   Select top 10 repos with score >= 30
+   Select top 5 repos with score >= 30
 
 3. ANALYZE EACH SELECTED REPO
-   For each selected repository (up to 10):
+   For each selected repository (up to 5):
 
    a) Clone it:
       mkdir -p repos
@@ -342,13 +342,13 @@ TASK - Complete this analysis autonomously:
    - completed (progress: 100)
 
 IMPORTANT GUIDELINES:
-- Be thorough but efficient - aim for 5-15 minutes total
+- Be thorough but efficient - aim for 5-10 minutes total
 - Be honest - if code quality is poor, say so
 - Be specific - reference actual file names, line numbers, patterns
 - Be fair - consider the candidate's apparent skill level
 - If you can't run tests due to dependencies, that's OK - note it and continue
-- Don't spend more than 2-3 minutes per repo on execution attempts
-- Focus on the top 3 repos most deeply, be briefer on repos 4-10
+- Don't spend more than 2 minutes per repo on dynamic analysis attempts
+- Focus on the top 2-3 repos most deeply, be briefer on repos 4-5
 
 Good luck! Provide a comprehensive, honest, actionable analysis.
 """
