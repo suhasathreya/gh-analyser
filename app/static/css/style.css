@@ -1,0 +1,171 @@
+/**
+ * Custom styles for GitHub Candidate Analyzer
+ * Supplements Tailwind CSS with specific customizations
+ */
+
+/* Smooth transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Progress bar animation */
+#progressBar {
+    transition: width 0.5s ease-out;
+}
+
+/* Form focus states */
+input:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* Report content styling */
+#reportContent {
+    line-height: 1.8;
+}
+
+#reportContent h1 {
+    font-size: 2em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.3em;
+}
+
+#reportContent h2 {
+    font-size: 1.5em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.2em;
+}
+
+#reportContent h3 {
+    font-size: 1.25em;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+}
+
+#reportContent code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+    font-size: 0.9em;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#reportContent pre {
+    background-color: #1f2937;
+    color: #f9fafb;
+    padding: 1em;
+    border-radius: 0.5em;
+    overflow-x: auto;
+    margin: 1em 0;
+}
+
+#reportContent pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+#reportContent table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+#reportContent th,
+#reportContent td {
+    border: 1px solid #e5e7eb;
+    padding: 0.75em;
+    text-align: left;
+}
+
+#reportContent th {
+    background-color: #f3f4f6;
+    font-weight: 600;
+}
+
+#reportContent tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+#reportContent blockquote {
+    border-left: 4px solid #4a90e2;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #6b7280;
+    font-style: italic;
+}
+
+#reportContent ul,
+#reportContent ol {
+    padding-left: 1.5em;
+    margin: 0.5em 0;
+}
+
+#reportContent li {
+    margin: 0.25em 0;
+}
+
+#reportContent a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+
+#reportContent a:hover {
+    text-decoration: underline;
+}
+
+#reportContent strong {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#reportContent em {
+    font-style: italic;
+    color: #6b7280;
+}
+
+#reportContent hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 2em 0;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Print styles */
+@media print {
+    header, footer, .no-print {
+        display: none;
+    }
+
+    body {
+        font-size: 12pt;
+    }
+
+    #reportContent {
+        max-width: 100%;
+    }
+}

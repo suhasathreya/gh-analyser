@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+analyses/
+*.pdf
+*.docx
+.DS_Store
+*.log
+node_modules/
+.claude/
+run.bat

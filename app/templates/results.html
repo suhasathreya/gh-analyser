@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - GitHub Candidate Analyzer{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- Action Buttons -->
+    <div class="mb-6 flex flex-wrap gap-3 justify-center">
+        <a
+            href="/export/{{ analysis_id }}/pdf"
+            class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-200 inline-flex items-center"
+        >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Download PDF
+        </a>
+
+        <a
+            href="/export/{{ analysis_id }}/docx"
+            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 inline-flex items-center"
+        >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Download Word
+        </a>
+
+        <button
+            onclick="copyMarkdown()"
+            class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition duration-200 inline-flex items-center"
+        >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+            Copy Markdown
+        </button>
+
+        <a
+            href="/"
+            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200 inline-flex items-center"
+        >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Analysis
+        </a>
+    </div>
+
+    <!-- Report Content -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <div id="reportContent" class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900 prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100">
+            <!-- Markdown will be rendered here -->
+        </div>
+    </div>
+</div>
+
+<!-- Markdown Parser -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script>
+    // Markdown content from server
+    const markdownContent = {{ report_markdown | tojson }};
+
+    // Configure marked
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: true,
+        mangle: false
+    });
+
+    // Render markdown to HTML
+    document.getElementById('reportContent').innerHTML = marked.parse(markdownContent);
+
+    // Copy markdown to clipboard
+    async function copyMarkdown() {
+        try {
+            await navigator.clipboard.writeText(markdownContent);
+
+            // Show success message
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+
+            button.innerHTML = `
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Copied!
+            `;
+            button.classList.remove('bg-gray-600', 'hover:bg-gray-700');
+            button.classList.add('bg-green-600', 'hover:bg-green-700');
+
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                button.classList.add('bg-gray-600', 'hover:bg-gray-700');
+            }, 2000);
+
+        } catch (error) {
+            alert('Failed to copy to clipboard: ' + error.message);
+        }
+    }
+
+    // Smooth scroll to top button (optional enhancement)
+    window.addEventListener('scroll', () => {
+        // Could add a "back to top" button here if needed
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis in Progress - GitHub Candidate Analyzer{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+            Analysis in Progress...
+        </h2>
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div
+                    id="progressBar"
+                    class="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out"
+                    style="width: {{ status.progress }}%"
+                ></div>
+            </div>
+            <p class="text-center mt-2 text-gray-600 font-semibold">
+                <span id="progressPercent">{{ status.progress }}</span>%
+            </p>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusText" class="text-center text-lg mb-6 min-h-[60px] flex items-center justify-center">
+            <span class="text-gray-700"></span>
+        </div>
+
+        <!-- Time Estimate -->
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-600">
+                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                This may take 5-15 minutes
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+                Progress updates every 10 seconds
+            </p>
+        </div>
+
+        <!-- Analysis ID (hidden, useful for debugging) -->
+        <div class="mt-4 text-center">
+            <details class="text-xs text-gray-400">
+                <summary class="cursor-pointer">Analysis ID</summary>
+                <code class="block mt-2 p-2 bg-gray-100 rounded">{{ analysis_id }}</code>
+            </details>
+        </div>
+    </div>
+
+    <!-- What's happening -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="font-semibold text-blue-900 mb-3">What's happening now:</h3>
+        <div class="space-y-2 text-sm text-blue-800">
+            <div id="step1" class="flex items-start">
+                <span class="mr-2">⏳</span>
+                <span>Fetching GitHub repositories...</span>
+            </div>
+            <div id="step2" class="flex items-start opacity-50">
+                <span class="mr-2">⏳</span>
+                <span>Filtering and scoring repos...</span>
+            </div>
+            <div id="step3" class="flex items-start opacity-50">
+                <span class="mr-2">⏳</span>
+                <span>Cloning and analyzing code...</span>
+            </div>
+            <div id="step4" class="flex items-start opacity-50">
+                <span class="mr-2">⏳</span>
+                <span>Generating comprehensive report...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/progress.js"></script>
+<script>
+    // Start polling for progress
+    startProgressPolling('{{ analysis_id }}');
+</script>
+{% endblock %}
